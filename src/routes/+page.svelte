@@ -9,23 +9,30 @@
     {
       name: "2x",
       description: "doubles click",
-      price: 100,
+      price: 50,
       priceMultiplier: 3,
       math: (e: string) => `${e} * 2`,
     },
     {
       name: "x^2",
       description: "squares click",
-      price: 1000,
-      priceMultiplier: 5,
+      price: 100,
+      priceMultiplier: 4,
       math: (e: string) => `(${e})^2`,
     },
     {
       name: "5x",
       description: "multiples click with 5",
-      price: 1300,
-      priceMultiplier: 4,
+      price: 500,
+      priceMultiplier: 6,
       math: (e: string) => `${e} * 5`,
+    },
+    {
+      name: "x^3",
+      description: "cubes click",
+      price: 1000,
+      priceMultiplier: 8,
+      math: (e: string) => `(${e})^3`,
     },
   ];
   const DEFAULT_SAVE = {
@@ -44,6 +51,10 @@
         price: UPGRADES[2].price,
         own: 0,
       },
+      "x^3": {
+        price: UPGRADES[3].price,
+        own: 0,
+      },
     },
   };
   let save: {
@@ -52,6 +63,10 @@
     upgrades: { [name: string]: { own: number; price: number } };
   } = $state(DEFAULT_SAVE);
   let copySaveText = $state("copy save");
+  let meth = $state(false);
+  let devMode = $state(false);
+  let autoClicker = $state(false);
+  let autoClickerInterval: NodeJS.Timeout;
 
   const onClick = () => {
     save.m += eval(save.equation.replace("^", "**"));
@@ -91,7 +106,7 @@
     saveToLocalStorage();
     copyText(encodeSave(save));
     copySaveText = "copied!";
-    setInterval(() => (copySaveText = "copy save"), 2000);
+    setTimeout(() => (copySaveText = "copy save"), 2000);
   };
 
   const onClickLoadSave = () => {
@@ -112,6 +127,14 @@
     }
   };
 
+  const onClickAutoClicker = () => {
+    if (autoClicker) {
+      autoClicker = false;
+      return clearInterval(autoClickerInterval);
+    }
+    autoClicker = true;
+    autoClickerInterval = setInterval(onClick, 50);
+  };
   onMount(() => {
     save = loadFromLocalStorage();
   });
@@ -119,9 +142,9 @@
 
 <div class="text-center">
   <h1 class="text-3xl">
-    math clicker<span class="text-lg">
-      - clicker game built with no engine</span
-    >
+    m<button onclick={() => (meth ? (meth = false) : (meth = true))}
+      >{meth ? "e" : "a"}</button
+    >th clicker<span class="text-lg"> - clicker game built with no engine</span>
   </h1>
 </div>
 <div class="flex">
@@ -139,13 +162,23 @@
         <p class="text-5xl">math</p>
       </button>
     </div>
-    <p
+    <div
       class="flex justify-start items-end h-[25dvh] w-[100%] text-lg ml-10 gap-5"
     >
       <button onclick={onClickCopySave}>{copySaveText}</button>
       <button onclick={onClickLoadSave}>load save</button>
       <button onclick={onClickClearSave}>clear save</button>
-    </p>
+      <div class="text-red-800">
+        <button
+          onclick={() => (devMode ? (devMode = false) : (devMode = true))}
+          class={devMode ? "" : "text-white"}
+          >devmode:
+        </button>
+        {#if devMode == true}
+          <button onclick={onClickAutoClicker}>autoclicker</button>
+        {/if}
+      </div>
+    </div>
   </div>
   <div
     class="flex h-[95dvh] md:w-[30%] w-[40%] rounded-l-2xl border p-5 flex-col"
