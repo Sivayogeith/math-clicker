@@ -22,6 +22,9 @@
         "typescript": "^5.0.0",
         "vite": "^7.0.4",
       },
+      "optionalDependencies": {
+        "@rollup/rollup-linux-x64-gnu": "4.6.1",
+      },
     },
   },
   "packages": {
@@ -42,6 +45,8 @@
     "@polka/url": ["@polka/url@1.0.0-next.29", "", {}, ""],
 
     "@rollup/rollup-darwin-arm64": ["@rollup/rollup-darwin-arm64@4.50.0", "", { "os": "darwin", "cpu": "arm64" }, ""],
+
+    "@rollup/rollup-linux-x64-gnu": ["@rollup/rollup-linux-x64-gnu@4.6.1", "", { "os": "linux", "cpu": "x64" }, "sha512-DNGZvZDO5YF7jN5fX8ZqmGLjZEXIJRdJEdTFMhiyXqyXubBa0WVLDWSNlQ5JR2PNgDbEV1VQowhVRUh+74D+RA=="],
 
     "@standard-schema/spec": ["@standard-schema/spec@1.0.0", "", {}, ""],
 
