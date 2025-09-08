@@ -3,7 +3,7 @@
   import { onMount } from "svelte";
   import Katex from "./Katex.svelte";
   import { Buffer } from "buffer";
-  import { copyText } from 'svelte-copy';
+  import { copyText } from "svelte-copy";
 
   const UPGRADES = [
     {
@@ -20,12 +20,15 @@
       priceMultiplier: 5,
       math: (e: string) => `(${e})^2`,
     },
+    {
+      name: "5x",
+      description: "multiples click with 5",
+      price: 1300,
+      priceMultiplier: 4,
+      math: (e: string) => `${e} * 5`,
+    },
   ];
-  let save: {
-    m: number;
-    equation: string;
-    upgrades: { [name: string]: { own: number; price: number } };
-  } = $state({
+  const DEFAULT_SAVE = {
     m: 0,
     equation: "1",
     upgrades: {
@@ -37,9 +40,18 @@
         price: UPGRADES[1].price,
         own: 0,
       },
+      "5x": {
+        price: UPGRADES[2].price,
+        own: 0,
+      },
     },
-  });
-  let copySaveText = $state("copy save")
+  };
+  let save: {
+    m: number;
+    equation: string;
+    upgrades: { [name: string]: { own: number; price: number } };
+  } = $state(DEFAULT_SAVE);
+  let copySaveText = $state("copy save");
 
   const onClick = () => {
     save.m += eval(save.equation.replace("^", "**"));
@@ -77,15 +89,28 @@
 
   const onClickCopySave = () => {
     saveToLocalStorage();
-    copyText(encodeSave(save))
-    copySaveText = "copied!"
-    setInterval(() => copySaveText = "copy save", 2000)
-  }
+    copyText(encodeSave(save));
+    copySaveText = "copied!";
+    setInterval(() => (copySaveText = "copy save"), 2000);
+  };
 
   const onClickLoadSave = () => {
-    const pastedSave = prompt("Paste your save here:", encodeSave(save)) as string;
-    save = decodeSave(pastedSave)
-  }
+    const pastedSave = prompt(
+      "Paste your save here:",
+      encodeSave(save)
+    ) as string;
+    save = decodeSave(pastedSave);
+  };
+
+  const onClickClearSave = () => {
+    if (
+      confirm("This will clear your save. Continue?") &&
+      confirm("ARE YOU ABSOLUTELY SURE YOU WANT TO CLEAR YOUR SAVE?")
+    ) {
+      save = DEFAULT_SAVE;
+      saveToLocalStorage();
+    }
+  };
 
   onMount(() => {
     save = loadFromLocalStorage();
@@ -118,7 +143,8 @@
       class="flex justify-start items-end h-[25dvh] w-[100%] text-lg ml-10 gap-5"
     >
       <button onclick={onClickCopySave}>{copySaveText}</button>
-      <button onclick={onClickLoadSave}>load</button>
+      <button onclick={onClickLoadSave}>load save</button>
+      <button onclick={onClickClearSave}>clear save</button>
     </p>
   </div>
   <div
